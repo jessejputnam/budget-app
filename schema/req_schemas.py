@@ -17,4 +17,9 @@ class TransactionAddSchema(BaseModel):
     payee: str
     amount: float
     envelope_id: int
-    account_id: int
+
+
+class TransferAddSchema(BaseModel):
+    from_account_id: int
+    to_account_id: int
+    amount: float
