@@ -2,7 +2,7 @@ from fastapi import FastAPI
 import pyodbc
 
 from functions.startup_code import get_conn_string
-from functions.lib import close_cxn
+from functions.lib import close_cxn, get_sql_cmd
 from schema.req_schemas import (
     AccountAddSchema,
     EnvelopeAddSchema,
@@ -16,14 +16,13 @@ app = FastAPI()
 
 conn_str = get_conn_string()
 
-
 @app.get("/accounts")
 async def get_accounts():
     user_id = 1
     try:
         conn = pyodbc.connect(conn_str)
         cursor = conn.cursor()
-        cmd = "SELECT * FROM [dbo].[account] WHERE user_id = ?"
+        cmd = get_sql_cmd("account_select_all")
 
         cursor.execute(cmd, user_id)
         rows = cursor.fetchall()
@@ -47,7 +46,7 @@ async def create_account(account: AccountAddSchema):
     try:
         conn = pyodbc.connect(conn_str)
         cursor = conn.cursor()
-        cmd = "INSERT INTO [dbo].[account] VALUES(?, ?, ?, CURRENT_TIMESTAMP)"
+        cmd = get_sql_cmd("account_insert")
 
         params = [user_id, account.name, account.amount]
         cursor.execute(cmd, params)
@@ -75,7 +74,7 @@ def create_envelope(env: EnvelopeAddSchema):
         conn = pyodbc.connect(conn_str)
         cursor = conn.cursor()
 
-        cmd = "INSERT INTO [dbo].[envelope] VALUES(?, ?, ?, ?, ?)"
+        cmd = get_sql_cmd("envelope_insert")
         params = [env.account_id, env.title, env.fill, env.fill, env.type]
         cursor.execute(cmd, params)
         cursor.commit()
@@ -99,12 +98,7 @@ def get_envelopes():
     try:
         conn = pyodbc.connect(conn_str)
         cursor = conn.cursor()
-        cmd = """
-            SELECT e.* 
-            FROM [dbo].[envelope] e
-            JOIN [dbo].[account] a ON e.[account_id] = a.[id]
-            WHERE a.[user_id] = ?
-            """
+        cmd = get_sql_cmd("envelope_select_all")
 
         cursor.execute(cmd, user_id)
         rows = cursor.fetchall()
@@ -124,31 +118,16 @@ def create_transaction(transaction: TransactionAddSchema):
     try:
         conn = pyodbc.connect(conn_str)
         cursor = conn.cursor()
-        cmd = "INSERT INTO [dbo].[transaction] VALUES(?, ?, ?, CURRENT_TIMESTAMP)"
-        params = [
-            transaction.payee,
-            transaction.amount,
-            transaction.envelope_id,
-        ]
+        cmd = get_sql_cmd("transaction_insert")
+
+        params = [transaction.payee, transaction.amount, transaction.envelope_id]
         cursor.execute(cmd, params)
 
-        cmd = """
-            UPDATE [dbo].[envelope]
-            SET [amount] = [amount] - ?, []
-            WHERE [id] = ?
-            """
+        cmd = get_sql_cmd("envelope_sub")
         params = [transaction.amount, transaction.envelope_id]
         cursor.execute(cmd, params)
 
-        cmd = """
-            UPDATE [dbo].[account] 
-            SET [amount] = [amount] - ?, [last_updated] = CURRENT_TIMESTAMP 
-            WHERE [id] = (
-                SELECT [account_id] 
-                FROM [dbo].[envelope]
-                WHERE [id] = ?
-            )
-            """
+        cmd = get_sql_cmd("account_sub_by_envelope")
         cursor.execute(cmd, params)
         cursor.commit()
 
@@ -168,13 +147,7 @@ def get_transactions():
     try:
         conn = pyodbc.connect(conn_str)
         cursor = conn.cursor()
-        cmd = """
-            SELECT t.* 
-            FROM [dbo].[transaction] t
-            JOIN [dbo].[envelope] e ON t.[envelope_id] = e.[id]
-            JOIN [dbo].[account] a ON e.[account_id] = a.[id]
-            WHERE a.[user_id] = ?
-            """
+        cmd = get_sql_cmd("transaction_select_all")
 
         cursor.execute(cmd, user_id)
         rows = cursor.fetchall()
@@ -193,27 +166,16 @@ def create_transfer(transfer: TransferAddSchema):
     try:
         conn = pyodbc.connect(conn_str)
         cursor = conn.cursor()
-        cmd = "INSERT INTO [dbo].[transfer] VALUES(?, ?, ?, CURRENT_TIMESTAMP)"
-        params = [
-            transfer.from_account_id,
-            transfer.to_account_id,
-            transfer.amount,
-        ]
+        cmd = get_sql_cmd("transfer_insert")
+
+        params = [transfer.from_account_id, transfer.to_account_id, transfer.amount]
         cursor.execute(cmd, params)
 
-        cmd = """
-            UPDATE [dbo].[account] 
-            SET [amount] = [amount] - ?, [last_updated] = CURRENT_TIMESTAMP 
-            WHERE [id] = ?
-            """
+        cmd = get_sql_cmd("account_sub_by_id")
         params = [transfer.amount, transfer.from_account_id]
         cursor.execute(cmd, params)
 
-        cmd = """
-            UPDATE [dbo].[account] 
-            SET [amount] = [amount] + ?, [last_updated] = CURRENT_TIMESTAMP 
-            WHERE [id] = ?
-            """
+        cmd = get_sql_cmd("account_add_by_id")
         params = [transfer.amount, transfer.to_account_id]
         cursor.execute(cmd, params)
 
@@ -235,12 +197,7 @@ def get_transfers():
     try:
         conn = pyodbc.connect(conn_str)
         cursor = conn.cursor()
-        cmd = """
-            SELECT t.* 
-            FROM [dbo].[transfer] t
-            JOIN [dbo].[account] a ON t.[from_account_id] = a.[id]
-            WHERE a.[user_id] = ?
-            """
+        cmd = get_sql_cmd("transfer_select_all")
 
         cursor.execute(cmd, user_id)
         rows = cursor.fetchall()
