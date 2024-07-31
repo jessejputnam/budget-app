@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 import pyodbc
 
 from functions.startup_code import get_conn_string
@@ -14,7 +15,18 @@ from models.res_models import ListResponse, ScalarResponse, VoidResponse
 
 app = FastAPI()
 
+origins = ["http://localhost:5173"]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 conn_str = get_conn_string()
+
 
 @app.get("/accounts")
 async def get_accounts():
