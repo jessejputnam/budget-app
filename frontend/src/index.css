@@ -31,13 +31,17 @@ body {
   padding: 5px 15px;
 }
 
+ul {
+  list-style: None;
+  padding: inherit;
+}
+
 div {
   place-items: inherit;
   width: 100%;
 }
 
 section {
-  /* justify-content: start; */
   text-align: left;
 }
 
@@ -76,4 +80,15 @@ button:focus-visible {
   button {
     background-color: #f9f9f9;
   }
+}
+
+
+/* ############################# */
+
+/* Envelopes */
+.envelopes > ul > * {
+  border: solid black 1px;
+  display: flex;
+  place-items: center start;
+  gap: 10px;
 }

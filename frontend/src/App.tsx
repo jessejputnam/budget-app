@@ -3,7 +3,21 @@ import "./App.css";
 import { Envelope } from "./types/types";
 import { EnvelopeItem } from "./Components/EnvelopeItem";
 
-// const domain = import.meta.env.URL;
+function filterEnvelopes(e: Envelope, type: string) {
+  return e.type !== type ? null : (
+    <li key={e.id}>
+      <EnvelopeItem
+        title={e.title}
+        amount={e.amount}
+        fill={e.fill}
+      />
+    </li>
+  )
+}
+
+function reduceTotal(envelopes: Array<Envelope>, type: string) {
+  return envelopes.reduce((acc, next) => acc + (next.type === type ? next.amount : 0), 0);
+}
 
 function App() {
   const [envelopes, setEnvelopes] = useState<[Envelope] | null>(null);
@@ -20,11 +34,13 @@ function App() {
 
         setEnvelopes(envelopeData.data);
         setError(null);
+
       } catch (err) {
         if (err instanceof Error) setError(err.message);
         else setError(err as string);
         console.log(err)
         setEnvelopes(null);
+
       } finally {
         setLoading(false);
       }
@@ -38,26 +54,29 @@ function App() {
       <h1>Envelopes</h1>
       {loading && <div>Loading...</div>}
       {error && <div>ERROR: {error}</div>}
-      <section>
+
+      <section className={"envelopes"}>
         <h2>Spending</h2>
+        <p>Left: {envelopes && reduceTotal(envelopes, "spending")}</p>
         <ul>
-          {envelopes &&
-            envelopes.map((e: Envelope) => (
-              <li key={e.id}>
-                <EnvelopeItem
-                  title={e.title}
-                  amount={e.amount}
-                  fill={e.fill}
-                />
-              </li>
-            ))}
+          {envelopes && envelopes.map((e: Envelope) => filterEnvelopes(e, "spending"))}
         </ul>
       </section >
-      <section>
+
+      <section className={"envelopes"}>
         <h2>Expenses</h2>
+        <p>Left: {envelopes && reduceTotal(envelopes, "expense")}</p>
+        <ul>
+          {envelopes && envelopes.map((e: Envelope) => filterEnvelopes(e, "expense"))}
+        </ul>
       </section>
-      <section>
+
+      <section className={"envelopes"}>
         <h2>Bills</h2>
+        <p>Left: {envelopes && reduceTotal(envelopes, "bill")}</p>
+        <ul>
+          {envelopes && envelopes.map((e: Envelope) => filterEnvelopes(e, "bill"))}
+        </ul>
       </section>
     </>
   );
