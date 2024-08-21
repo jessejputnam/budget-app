@@ -1,83 +1,28 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import "./App.css";
-import { Envelope } from "./types/types";
-import { EnvelopeItem } from "./Components/EnvelopeItem";
-
-function filterEnvelopes(e: Envelope, type: string) {
-  return e.type !== type ? null : (
-    <li key={e.id}>
-      <EnvelopeItem
-        title={e.title}
-        amount={e.amount}
-        fill={e.fill}
-      />
-    </li>
-  )
-}
-
-function reduceTotal(envelopes: Array<Envelope>, type: string) {
-  return envelopes.reduce((acc, next) => acc + (next.type === type ? next.amount : 0), 0);
-}
+import HomeScreen from "./Screens/HomeScreen";
+import EditEnvelopesScreen from "./Screens/EditEvelopesScreen";
+// import ErrorScreen from "./Screens/ErrorScreen";
 
 function App() {
-  const [envelopes, setEnvelopes] = useState<[Envelope] | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [screen, setScreen] = useState(<HomeScreen />);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const res: Response = await fetch(`http://127.0.0.1:8000/envelopes`);
-        if (!res.ok) throw new Error(`HTTP error: Status ${res.status}`);
+  const handleNavClick = (newScreen: JSX.Element) => setScreen(newScreen);
 
-        const envelopeData = await res.json();
 
-        setEnvelopes(envelopeData.data);
-        setError(null);
-
-      } catch (err) {
-        if (err instanceof Error) setError(err.message);
-        else setError(err as string);
-        console.log(err)
-        setEnvelopes(null);
-
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-  }, []);
+  //screen === "home" ? <HomeScreen /> : screen === "editEnvelopes" ? <EditEnvelopesScreen /> : null;
 
   return (
     <>
-      <h1>Envelopes</h1>
-      {loading && <div>Loading...</div>}
-      {error && <div>ERROR: {error}</div>}
-
-      <section className={"envelopes"}>
-        <h2>Spending</h2>
-        <p>Left: {envelopes && reduceTotal(envelopes, "spending")}</p>
+      <div>
         <ul>
-          {envelopes && envelopes.map((e: Envelope) => filterEnvelopes(e, "spending"))}
+          <li>
+            <button onClick={() => handleNavClick(<HomeScreen />)}>Home</button>
+            <button onClick={() => handleNavClick(<EditEnvelopesScreen />)}>Edit Envelopes</button>
+          </li>
         </ul>
-      </section >
-
-      <section className={"envelopes"}>
-        <h2>Expenses</h2>
-        <p>Left: {envelopes && reduceTotal(envelopes, "expense")}</p>
-        <ul>
-          {envelopes && envelopes.map((e: Envelope) => filterEnvelopes(e, "expense"))}
-        </ul>
-      </section>
-
-      <section className={"envelopes"}>
-        <h2>Bills</h2>
-        <p>Left: {envelopes && reduceTotal(envelopes, "bill")}</p>
-        <ul>
-          {envelopes && envelopes.map((e: Envelope) => filterEnvelopes(e, "bill"))}
-        </ul>
-      </section>
+      </div>
+      {screen}
     </>
   );
 }
