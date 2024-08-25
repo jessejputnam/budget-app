@@ -32,15 +32,13 @@ conn_str = get_conn_string()
 def create_envelope(env: EnvelopeAddSchema):
     try:
         if env.type not in ["bill", "expense", "spending", "debt"]:
-            raise Exception(
-                "Envelope type invalid. Choose: need, expense, spending, debt"
-            )
+            raise Exception("Envelope type must be bill, expense, spending, or debt")
 
         conn = pyodbc.connect(conn_str)
         cursor = conn.cursor()
 
         cmd = sql.envelope_addenvelope_insert()
-        params = [env.account_id, env.title, env.fill, env.fill, env.type]
+        params = [env.user_id, env.title, env.fill, env.fill, env.type]
         cursor.execute(cmd, params)
         cursor.commit()
 
