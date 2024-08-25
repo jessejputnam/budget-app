@@ -13,12 +13,6 @@ def close_cxn(conn: Connection, cursor: Cursor):
 
 def get_sql_cmd(sql_call: str):
     match sql_call:
-        case "account_select_all":
-            return "SELECT * FROM [dbo].[account] WHERE user_id = ?"
-
-        case "account_insert":
-            return "INSERT INTO [dbo].[account] VALUES(?, ?, ?, CURRENT_TIMESTAMP)"
-
         case "envelope_insert":
             return "INSERT INTO [dbo].[envelope] VALUES(?, ?, ?, ?, ?)"
 

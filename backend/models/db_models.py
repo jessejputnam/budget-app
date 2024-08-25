@@ -2,112 +2,94 @@ from datetime import datetime
 
 
 class User:
-    id: int
-    fname: str
-    lname: str
-    username: str
-    password: str
-    last_login: datetime
+    ua_id: int
+    ua_fname: str
+    ua_lname: str
+    ua_username: str
+    ua_password: str
+    ua_last_login: datetime
 
     def __init__(
         self,
-        id: int,
-        fname: str,
-        lname: str,
-        username: str,
-        password: str,
-        last_login: datetime,
+        ua_id: int,
+        ua_fname: str,
+        ua_lname: str,
+        ua_username: str,
+        ua_password: str,
+        ua_last_login: datetime,
     ):
-        self.id = id
-        self.fname = fname
-        self.lname = lname
-        self.username = username
-        self.password = password
-        self.last_login = last_login
-
-
-class Account:
-    id: int
-    user_id: int
-    name: str
-    amount: float
-    last_updated: datetime
-
-    def __init__(
-        self,
-        id: int,
-        user_id: int,
-        name: str,
-        amount: float,
-        last_updated: datetime,
-    ):
-        self.id = id
-        self.user_id = user_id
-        self.name = name
-        self.amount = amount
-        self.last_updated = last_updated
+        self.ua_id = ua_id
+        self.ua_fname = ua_fname
+        self.ua_lname = ua_lname
+        self.ua_username = ua_username
+        self.ua_password = ua_password
+        self.ua_last_login = ua_last_login
 
 
 class Envelope:
-    id: int
-    account_id: int
-    title: str
-    amount: float
-    fill: float
-    type: str
+    ae_id: int
+    ae_ua_id: int
+    ae_title: str
+    ae_amount: float
+    ae_fill: float
+    ae_type: str
 
     def __init__(
         self,
-        id: int,
-        account_id: int,
-        title: str,
-        amount: float,
-        fill: float,
-        type: str,
+        ae_id: int,
+        ae_ua_id: int,
+        ae_title: str,
+        ae_amount: float,
+        ae_fill: float,
+        ae_type: str,
     ):
-        self.id = id
-        self.account_id = account_id
-        self.title = title
-        self.amount = amount
-        self.fill = fill
-        self.type = type
+        self.ae_id = ae_id
+        self.ae_ua_id = ae_ua_id
+        self.ae_title = ae_title
+        self.ae_amount = ae_amount
+        self.ae_fill = ae_fill
+        self.ae_type = ae_type
 
 
 class Transaction:
-    id: int
-    payee: str
-    amount: float
-    envelope_id: int
-    account_id: int
-    timestamp: datetime
-
-    def __init__(
-        self, id: int, payee: str, amount: float, envelope_id: int, timestamp: datetime
-    ):
-        self.id = id
-        self.payee = payee
-        self.amount = amount
-        self.envelope_id = envelope_id
-        self.timestamp = timestamp
-
-
-class Transfer:
-    id: int
-    from_account_id: int
-    to_account_id: int
-    amount: float
-    timestamp: datetime
+    et_id: int
+    et_payee: str
+    et_amount: float
+    et_ae_id: int
+    et_timestamp: datetime
 
     def __init__(
         self,
-        id: int,
-        from_account_id: int,
-        to_account_id: int,
-        amount: float,
-        timestamp: datetime,
+        et_id: int,
+        et_payee: str,
+        et_amount: float,
+        et_ae_id: int,
+        et_timestamp: datetime,
     ):
-        self.id = id
-        self.from_account_id = from_account_id
-        self.to_acount_id = to_account_id
-        self.amount = amount
-        self.timestamp = timestamp
+        self.et_id = et_id
+        self.et_payee = et_payee
+        self.et_amount = et_amount
+        self.et_envelope_id = et_ae_id
+        self.et_timestamp = et_timestamp
+
+
+class EnvelopeTransfer:
+    eat_id: int
+    eat_from_ae_id: int
+    eat_to_ae_id: int
+    eat_transfer_amount: float
+    eat_timestamp: datetime
+
+    def __init__(
+        self,
+        eat_id: int,
+        eat_from_ae_id: int,
+        eat_to_ae_id: int,
+        eat_transfer_amount: float,
+        eat_timestamp: datetime,
+    ):
+        self.eat_id = eat_id
+        self.eat_from_ae_id = eat_from_ae_id
+        self.eat_to_ae_id = eat_to_ae_id
+        self.eat_transfer_amount = eat_transfer_amount
+        self.eat_timestamp = eat_timestamp
