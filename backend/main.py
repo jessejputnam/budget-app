@@ -51,7 +51,8 @@ def create_envelope(env: EnvelopeAddSchema):
         print(f"Error: {e}")
         res = ListResponse("ERROR", f"{e}")
     finally:
-        close_cxn(conn, cursor)
+        if conn is not None:
+            close_cxn(conn, cursor)
         return res
 
 

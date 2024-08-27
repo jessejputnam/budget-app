@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Envelope } from "../Types/types";
 import { EditEnvelopeItem } from "../Components/EditEnvelopeItem";
 import { Alert } from "../Components/Alert";
-import { fetchEnvelopes } from "../lib/DataFetch";
+import { envelopeGetAll } from "../lib/Controller";
 import { isValidEnvelopeTitle } from "../lib/TextValidate";
 
 import { btn1, btn2, btn3, h2, h3, modalBk, modalCard, text1, text2 } from "../lib/TailwindClass";
@@ -28,12 +28,22 @@ function EditEnvelopesScreen() {
     const [envelopes, setEnvelopes] = useState<Array<Envelope>>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    // const [msg, setMsg] = useState<string | null>(null);
     const [openModal, setOpenModal] = useState<boolean>(false);
-    const [msg, setMsg] = useState<string | null>(null);
+    const [addEnvMsg, setAddEnvMsg] = useState<string | null>(null);
     const [newEnvelope, setNewEnvelope] = useState<string>("");
+    // const [newEnvelopeFill, setNewEnvelopeFill] = useState<string>("");
 
     useEffect(() => {
-        fetchEnvelopes(setEnvelopes, setError, setLoading);
+        const fetchData = async () => {
+            const [err, data] = await envelopeGetAll<Envelope>();
+
+            setLoading(false);
+            if (err) setError(err);
+            else setEnvelopes(data?.data ?? [])
+        }
+
+        fetchData();
     }, []);
 
     function EnvelopeSection(envelopes: Array<Envelope>, type: string) {
@@ -48,16 +58,19 @@ function EditEnvelopesScreen() {
         )
     }
 
-    const addEnvelope = async () => {
+    const handleAddEnvelope = async () => {
         if (!isValidEnvelopeTitle(newEnvelope)) {
-            setMsg("Invalid envelope name.");
-            setTimeout(() => setMsg(null), 3000);
+            setAddEnvMsg("Invalid envelope name.");
+            setTimeout(() => setAddEnvMsg(null), 3000);
             return;
         }
 
 
+        // await envelopeAdd(newEnvelope,);
         setOpenModal(false);
         setNewEnvelope("");
+
+
     }
 
 
@@ -68,12 +81,13 @@ function EditEnvelopesScreen() {
             <h1 className={h2}>Envelopes</h1>
             {loading && <div>Loading...</div>}
             {error && <div>ERROR: {error}</div>}
+            {/* {msg && <Alert msg={msg} />} */}
 
             {
                 openModal &&
                 <div className={modalBk}>
                     <div className={modalCard}>
-                        {msg && <Alert msg={msg} />}
+                        {addEnvMsg && <Alert msg={addEnvMsg} />}
                         <div className="w-full">
                             <div className="m-8 my-20 max-w-[400px] mx-auto">
                                 <div className="mb-8 flex flex-col gap-2">
@@ -94,7 +108,7 @@ function EditEnvelopesScreen() {
                                     </select>
                                 </div>
                                 <div className="space-y-4">
-                                    <button className={btn2} onClick={addEnvelope}>Add Envelope</button>
+                                    <button className={btn2} onClick={handleAddEnvelope}>Add Envelope</button>
                                     <button className={btn3} onClick={handleModalClick}>Cancel</button>
                                 </div>
                             </div>

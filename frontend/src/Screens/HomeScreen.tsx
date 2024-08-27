@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { Envelope } from "../Types/types";
 import { EnvelopeItem } from "../Components/EnvelopeItem";
-import { fetchEnvelopes } from "../lib/DataFetch";
 import { h2, h3, text1 } from "../lib/TailwindClass";
+import { envelopeGetAll } from "../lib/Controller";
 
 
 function filterEnvelopes(e: Envelope, type: string) {
@@ -40,7 +40,15 @@ function HomeScreen() {
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
-        fetchEnvelopes(setEnvelopes, setError, setLoading);
+        const fetchData = async () => {
+            const [err, data] = await envelopeGetAll<Envelope>();
+
+            setLoading(false);
+            if (err) setError(err);
+            else setEnvelopes(data?.data ?? [])
+        }
+
+        fetchData();
     }, []);
 
     return (

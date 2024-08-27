@@ -29,3 +29,11 @@ export type Debt = {
 export type AlertProp = {
     msg: string
 }
+
+type ApiStructure<T> = {
+    status: string
+    message: string
+    data: T[]
+}
+
+export type ApiRes<T> = [string | null, ApiStructure<T> | null];
