@@ -1,4 +1,3 @@
-// import { useState } from 'react'
 import { EnvelopeProp } from "../Types/types"
 
 export function EnvelopeItem({ title, amount, fill }: EnvelopeProp) {

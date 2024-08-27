@@ -22,6 +22,10 @@ export type Envelope = {
 export type Debt = {
     id: number
     name: string
-    amount: number 
-    interest: number 
+    amount: number
+    interest: number
+}
+
+export type AlertProp = {
+    msg: string
 }

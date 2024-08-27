@@ -1,4 +1,4 @@
 export const isValidEnvelopeTitle = (title: string): boolean => {
     const pattern = /[;?!\\/><'"`~_)(%^$&|@+=]/;
-    return !pattern.test(title);
+    return title.trim().length > 0 && !pattern.test(title);
 }

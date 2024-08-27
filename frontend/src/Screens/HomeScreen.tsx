@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Envelope } from "../Types/types";
 import { EnvelopeItem } from "../Components/EnvelopeItem";
 import { fetchEnvelopes } from "../lib/DataFetch";
+import { h2, h3, text1 } from "../lib/TailwindClass";
 
 
 function filterEnvelopes(e: Envelope, type: string) {
@@ -22,9 +23,9 @@ function reduceTotal(envelopes: Array<Envelope>, type: string) {
 
 function EnvelopeSection(envelopes: Array<Envelope>, type: string) {
     return (
-        <section>
-            <h2>{type[0].toUpperCase()}{type.substring(1)}</h2>
-            <p>Left: {envelopes && reduceTotal(envelopes, type)}</p>
+        <section className="container max-w-screen-xl mx-auto">
+            <h3 className={h3}>{type[0].toUpperCase()}{type.substring(1)}</h3>
+            <p className={text1}>Left: {envelopes && reduceTotal(envelopes, type)}</p>
             <ul>
                 {envelopes && envelopes.map((e: Envelope) => filterEnvelopes(e, type))}
             </ul>
@@ -44,18 +45,18 @@ function HomeScreen() {
 
     return (
         <>
-            <h1>Envelopes</h1>
+            <h1 className={h2}>Envelopes</h1>
             {loading && <div>Loading...</div>}
             {error && <div>ERROR: {error}</div>}
 
             {
-                !loading &&
+                !loading && !error &&
                 <div>
                     {EnvelopeSection(envelopes, "spending")}
                     {EnvelopeSection(envelopes, "expense")}
                     {EnvelopeSection(envelopes, "bill")}
                     {EnvelopeSection(envelopes, "debt")}
-                </div>
+                </div >
             }
         </>
     );

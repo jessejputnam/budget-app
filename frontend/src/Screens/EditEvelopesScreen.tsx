@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
 import { Envelope } from "../Types/types";
 import { EditEnvelopeItem } from "../Components/EditEnvelopeItem";
+import { Alert } from "../Components/Alert";
 import { fetchEnvelopes } from "../lib/DataFetch";
+import { isValidEnvelopeTitle } from "../lib/TextValidate";
 
-const cssBtn = "bg-white hover:bg-gray-100 text-gray-800 py-1 px-2 border border-gray-400 rounded shadow";
+import { btn1, btn2, btn3, h2, h3, modalBk, modalCard, text1, text2 } from "../lib/TailwindClass";
 
 function filterEnvelopes(e: Envelope, type: string) {
     return e.type !== type ? null : (
@@ -27,12 +29,18 @@ function EditEnvelopesScreen() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [openModal, setOpenModal] = useState<boolean>(false);
+    const [msg, setMsg] = useState<string | null>(null);
+    const [newEnvelope, setNewEnvelope] = useState<string>("");
+
+    useEffect(() => {
+        fetchEnvelopes(setEnvelopes, setError, setLoading);
+    }, []);
 
     function EnvelopeSection(envelopes: Array<Envelope>, type: string) {
         return (
             <section className="container max-w-screen-xl mx-auto">
-                <h3 className="text-3xl font-bold dark:text-white">{type[0].toUpperCase()}{type.substring(1)}</h3>
-                <p className="text-sm font-normal text-gray-500 lg:text-xl dark:text-gray-400">Budgeted: {envelopes && reduceTotal(envelopes, type)}</p>
+                <h3 className={h3}>{type[0].toUpperCase()}{type.substring(1)}</h3>
+                <p className={text1}>Budgeted: {envelopes && reduceTotal(envelopes, type)}</p>
                 <ul>
                     {envelopes && envelopes.map((e: Envelope) => filterEnvelopes(e, type))}
                 </ul>
@@ -40,27 +48,45 @@ function EditEnvelopesScreen() {
         )
     }
 
-    useEffect(() => {
-        fetchEnvelopes(setEnvelopes, setError, setLoading);
-    }, []);
+    const addEnvelope = async () => {
+        if (!isValidEnvelopeTitle(newEnvelope)) {
+            setMsg("Invalid envelope name.");
+            setTimeout(() => setMsg(null), 3000);
+            return;
+        }
 
-    const handleModalClick = () => setOpenModal(!openModal);
+
+        setOpenModal(false);
+        setNewEnvelope("");
+    }
+
+
+    const handleModalClick = () => { setOpenModal(!openModal); setNewEnvelope("") };
 
     return (
         <>
-            <h1>Envelopes</h1>
+            <h1 className={h2}>Envelopes</h1>
             {loading && <div>Loading...</div>}
             {error && <div>ERROR: {error}</div>}
 
             {
                 openModal &&
-                <div className="fixed left-0 top-0 flex h-full w-full items-center justify-center bg-black bg-opacity-50 py-10">
-                    <div className="max-h-full w-full max-w-xl overflow-y-auto sm:rounded-2xl bg-white">
+                <div className={modalBk}>
+                    <div className={modalCard}>
+                        {msg && <Alert msg={msg} />}
                         <div className="w-full">
                             <div className="m-8 my-20 max-w-[400px] mx-auto">
                                 <div className="mb-8 flex flex-col gap-2">
-                                    <input className="p-3 bg-white border rounded-sm w-full font-semibold" type="text" name="envTitle" id="envTitle" placeholder="Rent" />
-                                    <select className="p-3 bg-white border rounded-sm w-full font-semibold" name="envType" id="envType">
+                                    <input
+                                        className={text2}
+                                        type="text"
+                                        name="envTitle"
+                                        id="envTitle"
+                                        placeholder="Rent"
+                                        value={newEnvelope}
+                                        onChange={e => setNewEnvelope(e.target.value)}
+                                    />
+                                    <select className={text2} name="envType" id="envType">
                                         <option value="bill">Bill</option>
                                         <option value="expense">Expense</option>
                                         <option value="spending">Spending</option>
@@ -68,7 +94,8 @@ function EditEnvelopesScreen() {
                                     </select>
                                 </div>
                                 <div className="space-y-4">
-                                    <button className="p-3 bg-white border rounded-full w-full font-semibold" onClick={handleModalClick}>Cancel</button>
+                                    <button className={btn2} onClick={addEnvelope}>Add Envelope</button>
+                                    <button className={btn3} onClick={handleModalClick}>Cancel</button>
                                 </div>
                             </div>
                         </div>
@@ -80,15 +107,15 @@ function EditEnvelopesScreen() {
             {
                 !loading &&
                 <div>
-                    <button className={cssBtn} onClick={handleModalClick}>Add Envelope</button>
+                    <button className={btn1} onClick={handleModalClick}>Add Envelope</button>
                     {EnvelopeSection(envelopes, "spending")}
                     {EnvelopeSection(envelopes, "expense")}
                     {EnvelopeSection(envelopes, "bill")}
                     {EnvelopeSection(envelopes, "debt")}
 
                     <section>
-                        <h2 className="text-4xl font-bold dark:text-white">Total Budgeted</h2>
-                        <p className="text-lg font-normal text-gray-500 lg:text-xl dark:text-gray-400">{envelopes && reduceTotal(envelopes)}</p>
+                        <h2 className={h3}>Total Budgeted</h2>
+                        <p className={text1}>{envelopes && reduceTotal(envelopes)}</p>
                     </section>
                 </div>
             }
