@@ -11,12 +11,12 @@ export type EnvelopeProp = {
 }
 
 export type Envelope = {
-    id: number
-    account_id: number
-    title: string
-    amount: number
-    fill: number
-    type: string
+    ae_id: number
+    ae_ua_id: number
+    ae_title: string
+    ae_amount: number
+    ae_fill: number
+    ae_type: string
 }
 
 export type Debt = {

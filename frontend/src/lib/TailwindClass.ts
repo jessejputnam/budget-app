@@ -13,3 +13,6 @@ export const text2 = "p-3 bg-white border rounded-sm w-full font-semibold";
 // Modal
 export const modalBk = "fixed left-0 top-0 flex h-full w-full items-center justify-center bg-black bg-opacity-50 py-10";
 export const modalCard = "max-h-full w-full max-w-xl overflow-y-auto sm:rounded-2xl bg-white relative";
+
+// Home/Envelope Screens
+export const envSection = "container max-w-screen-xl mx-auto my-3"

@@ -37,7 +37,7 @@ def create_envelope(env: EnvelopeAddSchema):
         conn = pyodbc.connect(conn_str)
         cursor = conn.cursor()
 
-        cmd = sql.envelope_addenvelope_insert()
+        cmd = sql.envelope_insert()
         params = [env.user_id, env.title, env.fill, env.fill, env.type]
         cursor.execute(cmd, params)
         cursor.commit()

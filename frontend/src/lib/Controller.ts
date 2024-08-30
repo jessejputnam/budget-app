@@ -31,13 +31,14 @@ export async function envelopeAdd(envName: string, envFill: number, envType: str
 
         if (!res.ok) {
             console.log(`HTTP error: Status ${res.status}`);
-            return [new Error(`HTTP error: Status ${res.status}`), null];
+            return `HTTP error: Status ${res.status}`;
         }
         const data = await res.json();
-        console.log(data)
-        return [null, 200]
+        if (data.status == "ERROR")
+            return data.message
+        return null
     } catch (err) {
         console.log(err);
-        return [err instanceof Error ? err.message : err as string, null]
+        return err instanceof Error ? err.message : err as string
     }
 }
