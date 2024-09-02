@@ -1,7 +1,7 @@
-// import React from "react";
+// REACT PROPS
 export type EditEnvelopeProp = {
-    title: string
-    fill: number
+    envelope: Envelope
+    setDelEnvelope: React.Dispatch<React.SetStateAction<Envelope | null>>
 }
 
 export type EnvelopeProp = {
@@ -10,6 +10,45 @@ export type EnvelopeProp = {
     fill: number
 }
 
+export type AddEnvelopeModalProps = {
+    setOpenModal: React.Dispatch<React.SetStateAction<boolean>>
+    setLoading: React.Dispatch<React.SetStateAction<boolean>>
+    setError: React.Dispatch<React.SetStateAction<string | null>>
+    setEnvelopes: React.Dispatch<React.SetStateAction<Envelope[]>>
+}
+
+export type DelEnvelopeModalProps = {
+    delEnvelope: Envelope | null
+    setDelEnvelope: React.Dispatch<React.SetStateAction<Envelope | null>>
+    setLoading: React.Dispatch<React.SetStateAction<boolean>>
+    setError: React.Dispatch<React.SetStateAction<string | null>>
+    setEnvelopes: React.Dispatch<React.SetStateAction<Envelope[]>>
+}
+
+export type AlertProps = {
+    msg: string
+}
+
+export type ButtonProps = {
+    onClick: React.MouseEventHandler<HTMLButtonElement> | undefined
+    disabled?: boolean | undefined
+    text: string
+}
+
+
+// FUNCTION ARGS
+export type EditEnvelopeSectionArgs = {
+    envelopes: Array<Envelope>
+    type: string
+    setDelEnvelope: React.Dispatch<React.SetStateAction<Envelope | null>>
+}
+
+export type EnvelopeSectionArgs = {
+    envelopes: Array<Envelope>
+    type: string
+}
+
+// CLASSES
 export type Envelope = {
     ae_id: number
     ae_ua_id: number
@@ -26,10 +65,7 @@ export type Debt = {
     interest: number
 }
 
-export type AlertProp = {
-    msg: string
-}
-
+// API
 type ApiStructure<T> = {
     status: string
     message: string

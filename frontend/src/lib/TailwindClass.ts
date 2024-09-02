@@ -1,6 +1,6 @@
 // Buttons
 export const btn1 = "bg-white hover:bg-gray-100 text-gray-800 py-1 px-2 border border-gray-400 rounded shadow";
-export const btn2 = "text-white bg-gradient-to-r from-cyan-400 via-cyan-500 to-cyan-600 hover:bg-gradient-to-br active:saturate-0 font-semibold rounded-full w-full p-3 text-center me-2 mb-2";
+export const btn2 = "text-white bg-gradient-to-r from-cyan-400 via-cyan-500 to-cyan-600 hover:bg-gradient-to-br active:saturate-0 font-semibold rounded-full w-full p-3 text-center me-2 mb-2 disabled:cursor-not-allowed disabled:saturate-0";
 export const btn3 = "p-3 bg-slate-50 hover:bg-slate-100 active:bg-slate-300 border rounded-full w-full font-semibold";
 
 // Text

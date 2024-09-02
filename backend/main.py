@@ -37,12 +37,38 @@ def create_envelope(env: EnvelopeAddSchema):
         conn = pyodbc.connect(conn_str)
         cursor = conn.cursor()
 
-        cmd = sql.envelope_insert()
+        cmd = sql.envelope_insert_one()
         params = [env.user_id, env.title, env.fill, env.fill, env.type]
         cursor.execute(cmd, params)
         cursor.commit()
 
         res = VoidResponse("SUCCESS", "Envelope created")
+    except pyodbc.Error as e:
+        print(f"Error: {e}")
+        cursor.rollback()
+        res = VoidResponse("ERROR", f"{e}")
+    except Exception as e:
+        print(f"Error: {e}")
+        res = ListResponse("ERROR", f"{e}")
+    finally:
+        if conn is not None:
+            close_cxn(conn, cursor)
+        return res
+
+
+@app.delete("/envelopes/{id}")
+def del_envelope(id: int):
+    user_id = 1
+    try:
+        conn = pyodbc.connect(conn_str)
+        cursor = conn.cursor()
+
+        cmd = sql.envelope_delete_one()
+        params = [id]
+        cursor.execute(cmd, params)
+        cursor.commit()
+
+        res = VoidResponse("SUCCESS", f"Envelope with id <{id}> deleted")
     except pyodbc.Error as e:
         print(f"Error: {e}")
         cursor.rollback()
@@ -73,7 +99,8 @@ def get_envelopes():
         print(f"Error: {e}")
         res = ListResponse("ERROR", f"{e}")
     finally:
-        close_cxn(conn, cursor)
+        if conn is not None:
+            close_cxn(conn, cursor)
         return res
 
 

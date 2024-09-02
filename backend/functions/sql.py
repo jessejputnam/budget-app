@@ -1,4 +1,4 @@
-def envelope_insert():
+def envelope_insert_one():
     return """
         INSERT INTO [dbo].[account_envelope] (
             ae_ua_id, 
@@ -9,6 +9,13 @@ def envelope_insert():
         )
         VALUES (?, ?, ?, ?, ?)
         """
+
+
+def envelope_delete_one():
+    return """
+        DELETE FROM [dbo].[account_envelope]
+        WHERE [ae_id] = ?
+    """
 
 
 def envelope_get_all():
