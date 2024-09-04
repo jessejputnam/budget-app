@@ -14,15 +14,15 @@ function App() {
   const cssHeader = "flex items-center justify-center p-4 shadow gap-10";
 
   return (
-    <>
-      <div className="container max-w-screen-xl mx-auto px-4">
-        <div className={cssHeader}>
-          <button className={cssBtn} onClick={() => handleNavClick(<HomeScreen />)}>Home</button>
-          <button className={cssBtn} onClick={() => handleNavClick(<EditEnvelopesScreen />)}>Edit Envelopes</button>
-        </div>
+    <div className="w-full">
+      <div className={cssHeader}>
+        <button className={cssBtn} onClick={() => handleNavClick(<HomeScreen />)}>Home</button>
+        <button className={cssBtn} onClick={() => handleNavClick(<EditEnvelopesScreen />)}>Edit Envelopes</button>
+      </div>
+      <div className="w-full p-2">
         {screen}
       </div>
-    </>
+    </div>
   );
 }
 

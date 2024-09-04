@@ -1,40 +1,13 @@
 import { useEffect, useState } from "react";
-import { EditEnvelopeSectionArgs, Envelope } from "../Types/types";
-import { EditEnvelopeItem } from "../Components/EditEnvelopeItem";
+import { Envelope } from "../Types/types";
 import { AddEnvelopeModal } from "../Components/Modals/AddEnvelopeModal";
 import { DelEnvelopeModal } from "../Components/Modals/DelEnvelopeModal";
 import { envelopeGetAll } from "../lib/Controller";
 
-import { btn1, envSection, h2, h3, text1 } from "../lib/TailwindClass";
-
-function filterEnvelopes(
-    e: Envelope,
-    type: string,
-    setDelEnvelope: React.Dispatch<React.SetStateAction<Envelope | null>>
-) {
-    return e.ae_type !== type ? null : (
-        <li key={e.ae_id}>
-            <EditEnvelopeItem
-                envelope={e}
-                setDelEnvelope={setDelEnvelope}
-            />
-        </li>
-    )
-}
-
-function EnvelopeSection({ envelopes, type, setDelEnvelope }: EditEnvelopeSectionArgs) {
-    return (
-        <section className={envSection}>
-            <div className="flex gap-5">
-                <h3 className={h3}>{type[0].toUpperCase()}{type.substring(1)}</h3>
-                <p className={`${text1} relative top-2`}>Budgeted: {envelopes && reduceTotal(envelopes, type)}</p>
-            </div>
-            <ul>
-                {envelopes && envelopes.map((e: Envelope) => filterEnvelopes(e, type, setDelEnvelope))}
-            </ul>
-        </section >
-    )
-}
+import { btn1, h2, h3, text1 } from "../lib/TailwindClass";
+import { EnvelopeSection } from "../Components/EnvelopeSection";
+import { ButtonRefreshEnvelopes } from "../Components/Buttons/ButtonRefreshEnvelopes";
+import { LoadingSpinner } from "../Components/LoadingSpinner";
 
 function reduceTotal(envelopes: Array<Envelope>, type?: string): string {
     return !type
@@ -78,27 +51,18 @@ function EditEnvelopesScreen() {
 
     const handleModalClick = () => { setOpenModal(!openModal) };
 
-    const handleRefreshClick = async () => {
-        setLoading(true);
-        setError(null);
-        const [err, data] = await envelopeGetAll<Envelope>();
-        setLoading(false);
-        if (err) setError(err);
-        else setEnvelopes(data?.data ?? []);
-
-    };
+    const btnProps = { setEnvelopes, setLoading, setError }
 
     return (
         <>
-            <h1 className={h2}>Envelopes</h1>
-            {loading && <div>Loading...</div>}
-            {
-                error &&
+            <h1 className={h2}>Edit Envelopes</h1>
+            {loading && <LoadingSpinner />}
+
+            {error &&
                 <div>
                     <p>ERROR: {error}</p>
-                    <button className={btn1} onClick={handleRefreshClick}>Retry</button>
-                </div>
-            }
+                    <ButtonRefreshEnvelopes {...btnProps} />
+                </div>}
 
             {openModal && <AddEnvelopeModal {...addEnvModProps} />}
             {delEnvelope && <DelEnvelopeModal {...delEnvModProps} />}
@@ -108,10 +72,10 @@ function EditEnvelopesScreen() {
                 !loading && !error &&
                 <div>
                     <button className={btn1} onClick={handleModalClick}>Add Envelope</button>
-                    {EnvelopeSection({ envelopes, type: "spending", setDelEnvelope })}
-                    {EnvelopeSection({ envelopes, type: "expense", setDelEnvelope })}
-                    {EnvelopeSection({ envelopes, type: "bill", setDelEnvelope })}
-                    {EnvelopeSection({ envelopes, type: "debt", setDelEnvelope })}
+                    {EnvelopeSection({ envelopes, type: "spending", isEdit: true, setDelEnvelope })}
+                    {EnvelopeSection({ envelopes, type: "expense", isEdit: true, setDelEnvelope })}
+                    {EnvelopeSection({ envelopes, type: "bill", isEdit: true, setDelEnvelope })}
+                    {EnvelopeSection({ envelopes, type: "debt", isEdit: true, setDelEnvelope })}
 
                     <section>
                         <h2 className={h3}>Total Budgeted</h2>

@@ -5,10 +5,16 @@ export type EditEnvelopeProp = {
 }
 
 export type EnvelopeProp = {
-    title: string
-    amount: number
-    fill: number
+    envelope: Envelope
 }
+
+export type EnvelopeSectionProps = {
+    envelopes: Envelope[] | null
+    type: string
+    isEdit?: boolean
+    setDelEnvelope?: React.Dispatch<React.SetStateAction<Envelope | null>>
+}
+
 
 export type AddEnvelopeModalProps = {
     setOpenModal: React.Dispatch<React.SetStateAction<boolean>>
@@ -33,6 +39,12 @@ export type ButtonProps = {
     onClick: React.MouseEventHandler<HTMLButtonElement> | undefined
     disabled?: boolean | undefined
     text: string
+}
+
+export type ButtonRefreshEnvelopesProps = {
+    setEnvelopes: React.Dispatch<React.SetStateAction<Envelope[]>>
+    setLoading: React.Dispatch<React.SetStateAction<boolean>>
+    setError: React.Dispatch<React.SetStateAction<string | null>>
 }
 
 

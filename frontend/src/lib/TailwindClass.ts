@@ -4,10 +4,10 @@ export const btn2 = "text-white bg-gradient-to-r from-cyan-400 via-cyan-500 to-c
 export const btn3 = "p-3 bg-slate-50 hover:bg-slate-100 active:bg-slate-300 border rounded-full w-full font-semibold";
 
 // Text
-export const h2 = "text-4xl text-slate-500 font-bold dark:text-white";
-export const h3 = "text-3xl text-slate-400 font-bold dark:text-white";
+export const h2 = "text-4xl text-slate-500 font-bold";
+export const h3 = "text-3xl text-slate-400 font-bold m-2";
 
-export const text1 = "text-sm font-normal text-gray-500 lg:text-xl dark:text-gray-400";
+export const text1 = "text-sm font-normal text-gray-500";
 export const text2 = "p-3 bg-white border rounded-sm w-full font-semibold";
 
 // Modal
