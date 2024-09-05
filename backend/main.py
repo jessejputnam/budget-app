@@ -7,11 +7,12 @@ from functions.lib import close_cxn
 from functions import sql
 from schema.req_schemas import (
     EnvelopeAddSchema,
+    EnvelopeEditSchema,
     TransactionAddSchema,
     EnvelopeTransferAddSchema,
 )
 from models.db_models import Envelope, Transaction
-from models.res_models import ListResponse, ScalarResponse, VoidResponse
+from models.res_models import ListResponse, VoidResponse
 
 app = FastAPI()
 
@@ -26,6 +27,7 @@ app.add_middleware(
 )
 
 conn_str = get_conn_string()
+conn = None
 
 
 @app.post("/envelopes")
@@ -42,40 +44,14 @@ def create_envelope(env: EnvelopeAddSchema):
         cursor.execute(cmd, params)
         cursor.commit()
 
-        res = VoidResponse("SUCCESS", "Envelope created")
+        res = VoidResponse("SUCCESS", 200, "Envelope created")
     except pyodbc.Error as e:
         print(f"Error: {e}")
         cursor.rollback()
-        res = VoidResponse("ERROR", f"{e}")
+        res = VoidResponse("ERROR", 500, f"{e}")
     except Exception as e:
         print(f"Error: {e}")
-        res = ListResponse("ERROR", f"{e}")
-    finally:
-        if conn is not None:
-            close_cxn(conn, cursor)
-        return res
-
-
-@app.delete("/envelopes/{id}")
-def del_envelope(id: int):
-    user_id = 1
-    try:
-        conn = pyodbc.connect(conn_str)
-        cursor = conn.cursor()
-
-        cmd = sql.envelope_delete_one()
-        params = [id]
-        cursor.execute(cmd, params)
-        cursor.commit()
-
-        res = VoidResponse("SUCCESS", f"Envelope with id <{id}> deleted")
-    except pyodbc.Error as e:
-        print(f"Error: {e}")
-        cursor.rollback()
-        res = VoidResponse("ERROR", f"{e}")
-    except Exception as e:
-        print(f"Error: {e}")
-        res = ListResponse("ERROR", f"{e}")
+        res = VoidResponse("ERROR", 500, f"{e}")
     finally:
         if conn is not None:
             close_cxn(conn, cursor)
@@ -94,10 +70,60 @@ def get_envelopes():
         rows = cursor.fetchall()
         data = [Envelope(*row) for row in rows]
 
-        res = ListResponse("SUCCESS", "User envelopes retrieved", data)
+        res = ListResponse("SUCCESS", 200, "User envelopes retrieved", data)
     except pyodbc.Error as e:
         print(f"Error: {e}")
-        res = ListResponse("ERROR", f"{e}")
+        res = ListResponse("ERROR", 500, f"{e}")
+    finally:
+        if conn is not None:
+            close_cxn(conn, cursor)
+        return res
+
+
+@app.delete("/envelopes/{id}")
+def del_envelope(id: int):
+    user_id = 1
+    try:
+        conn = pyodbc.connect(conn_str)
+        cursor = conn.cursor()
+
+        cmd = sql.envelope_delete_one()
+        params = [id]
+        cursor.execute(cmd, params)
+        cursor.commit()
+
+        res = VoidResponse("SUCCESS", 200, f"Envelope with id <{id}> deleted")
+    except pyodbc.Error as e:
+        print(f"Error: {e}")
+        cursor.rollback()
+        res = VoidResponse("ERROR", 500, f"{e}")
+    except Exception as e:
+        print(f"Error: {e}")
+        res = VoidResponse("ERROR", 500, f"{e}")
+    finally:
+        if conn is not None:
+            close_cxn(conn, cursor)
+        return res
+
+
+@app.patch("/envelopes/{id}")
+def update_envelope(envelope: EnvelopeEditSchema):
+    try:
+        conn = pyodbc.connect(conn_str)
+        cursor = conn.cursor()
+
+        cmd = sql.envelope_update()
+        params = []
+        cursor.execute(cmd, params)
+        cursor.commit()
+
+    except pyodbc.Error as e:
+        print(f"Error: {e}")
+        cursor.rollback()
+        res = VoidResponse("ERROR", 500, f"{e}")
+    except Exception as e:
+        print(f"Error: {e}")
+        res = VoidResponse("ERROR", 500, f"{e}")
     finally:
         if conn is not None:
             close_cxn(conn, cursor)
@@ -120,11 +146,11 @@ def create_transaction(transaction: TransactionAddSchema):
 
         cursor.commit()
 
-        res = VoidResponse("SUCCESS", "Transaction created")
+        res = VoidResponse("SUCCESS", 200, "Transaction created")
     except pyodbc.Error as e:
         print(f"Error: {e}")
         cursor.rollback()
-        res = VoidResponse("ERROR", f"{e}")
+        res = VoidResponse("ERROR", 500, f"{e}")
     finally:
         close_cxn(conn, cursor)
         return res
@@ -141,10 +167,10 @@ def get_transactions():
         cursor.execute(cmd, user_id)
         rows = cursor.fetchall()
         data = [Transaction(*row) for row in rows]
-        res = ListResponse("SUCCESS", "User transactions retrieved", data)
+        res = ListResponse("SUCCESS", 200, "User transactions retrieved", data)
     except pyodbc.Error as e:
         print(f"Error: {e}")
-        res = ListResponse("ERROR", f"{e}")
+        res = ListResponse("ERROR", 500, f"{e}")
     finally:
         close_cxn(conn, cursor)
         return res
@@ -170,11 +196,11 @@ def create_transfer(transfer: EnvelopeTransferAddSchema):
 
         cursor.commit()
 
-        res = VoidResponse("SUCCESS", "Transfer created")
+        res = VoidResponse("SUCCESS", 200, "Transfer created")
     except pyodbc.Error as e:
         print(f"Error: {e}")
         cursor.rollback()
-        res = VoidResponse("ERROR", f"{e}")
+        res = VoidResponse("ERROR", 500, f"{e}")
     finally:
         close_cxn(conn, cursor)
         return res

@@ -26,6 +26,14 @@ def envelope_get_all():
         """
 
 
+def envelope_update():
+    return """
+    UPDATE [dbo].[account_envelope]
+    SET [ae_title] = ?, [ae_fill] = ?, [ae_type] = ?
+    WHERE [ae_id] = ?
+    """
+
+
 def envelope_transfer_insert():
     return """
         INSERT INTO [dbo].[envelope_amount_transfer] (

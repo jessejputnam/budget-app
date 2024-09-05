@@ -23,6 +23,14 @@ export type AddEnvelopeModalProps = {
     setEnvelopes: React.Dispatch<React.SetStateAction<Envelope[]>>
 }
 
+export type EditEnvelopeModalProps = {
+    editEnvelope: Envelope | null
+    setEditEnvelope: React.Dispatch<React.SetStateAction<Envelope | null>>
+    setLoading: React.Dispatch<React.SetStateAction<boolean>>
+    setError: React.Dispatch<React.SetStateAction<string | null>>
+    setEnvelopes: React.Dispatch<React.SetStateAction<Envelope[]>>
+}
+
 export type DelEnvelopeModalProps = {
     delEnvelope: Envelope | null
     setDelEnvelope: React.Dispatch<React.SetStateAction<Envelope | null>>

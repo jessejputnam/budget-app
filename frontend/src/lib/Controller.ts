@@ -68,3 +68,17 @@ export async function envelopeDeleteOne(envelopeId: number): Promise<string | nu
         return err instanceof Error ? err.message : err as string
     }
 }
+
+export async function envelopeUpdate(id: number, title: string, fill: number, type: string): Promise<string | null> {
+    try {
+        const res: Response = await fetch(`${url}/envelopes/${id}`, {
+            method: "DELETE",
+            headers: {
+                "Content-Type": "application/json; charset=UTF-8"
+            }
+        });
+    } catch (err) {
+        console.log(err);
+        return err instanceof Error ? err.message : err as string
+    }
+}
