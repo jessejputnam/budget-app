@@ -2,59 +2,86 @@ import { useState } from "react";
 import { Alert } from "../Alert";
 import { modalBk, modalCard, text2 } from "../../lib/TailwindClass";
 import { isValidEnvelopeTitle } from "../../lib/TextValidate";
-import { envelopeAdd, envelopeGetAll } from "../../lib/Controller";
-import { EditEnvelopeModalProps, Envelope } from "../../Types/types";
+import { envelopeGetAll, envelopeUpdate } from "../../Controllers/EnvelopeController";
+import { EditEnvelopeModalProps } from "../../Types/PropTypes";
+import { Envelope } from "../../Classes/Envelope";
 import { ButtonAction } from "../Buttons/ButtonAction";
 import { ButtonCancel } from "../Buttons/ButtonCancel";
+import { DbEnvelope } from "../../Types/DbTypes";
 
+//! REMOVE WITH AUTH
+const user_id = 1
 
 export function EditEnvelopeModal(props: EditEnvelopeModalProps) {
-    const [newEnvelopeTitle, setNewEnvelopeTitle] = useState<string>(props.editEnvelope?.ae_title ?? "");
-    const [newEnvelopeFill, setNewEnvelopeFill] = useState<string>(props.editEnvelope?.ae_fill.toString() ?? "0.00");
-    const [newEnvelopeType, setNewEnvelopeType] = useState<string>(props.editEnvelope?.ae_type ?? "");
+    const [title, setTitle] = useState<string>(props.editEnvelope?.title ?? "");
+    const [fill, setFill] = useState<string>(props.editEnvelope?.fill?.toFixed(2) ?? "0.00");
+    const [type, setType] = useState<string>(props.editEnvelope?.type ?? "");
     const [editEnvMsg, setEditEnvMsg] = useState<string | null>(null);
     const [disabled, setDisabled] = useState<boolean>(false);
+    const [amount, setAmount] = useState<number>(props.editEnvelope?.amount ?? 0);
+    const id = props.editEnvelope?.id;
 
     const handleUpdateEnvelope = async () => {
         setDisabled(true);
 
-        if (!isValidEnvelopeTitle(newEnvelopeTitle)) {
+        if (amount > Number(fill)) {
+            setAmount(Number(fill));
+        }
+
+        if (!isValidEnvelopeTitle(title)) {
             setDisabled(false);
             setEditEnvMsg("Invalid envelope name.");
             setTimeout(() => setEditEnvMsg(null), 3000);
             return;
         }
 
-        if (isNaN(Number(newEnvelopeFill)) || Number(newEnvelopeFill) <= 0) {
+        if (isNaN(Number(fill)) || Number(fill) <= 0) {
             setDisabled(false);
             setEditEnvMsg("Fill must be a valid monetary amount above $0.00.");
             setTimeout(() => setEditEnvMsg(null), 3000);
             return;
         }
 
-        const err = await envelopeAdd(newEnvelopeTitle, Number(newEnvelopeFill), newEnvelopeType);
+        if (id === null || id === undefined) {
+            setDisabled(false);
+            setEditEnvMsg("Envelope ID cannot be null.");
+            setTimeout(() => setEditEnvMsg(null), 3000);
+            return;
+        }
+
+
+        const envData = {
+            user_id,
+            id: id,
+            title: title,
+            fill: Number(fill),
+            amount: Number(fill),
+            type: type
+        }
+        const err = await envelopeUpdate(envData);
         if (err) {
             setDisabled(false);
             setEditEnvMsg(err)
             setTimeout(() => setEditEnvMsg(null), 3000);
+            return;
         }
 
         props.setLoading(true);
-        const [e, data] = await envelopeGetAll<Envelope>();
+        const [e, data] = await envelopeGetAll<DbEnvelope>();
 
         if (e) { props.setEnvelopes([]); props.setError(e); }
-        else { props.setEnvelopes(data?.data ?? []) }
+        else { props.setEnvelopes(data?.data.map((e: DbEnvelope) => new Envelope(e)) ?? []) }
 
         props.setLoading(false);
         props.setEditEnvelope(null);
     }
 
 
-    const handleModalClick = () => { props.setEditEnvelope(null) };
+    const handleCancelClick = () => { props.setEditEnvelope(null) };
 
     const handleFillBlur = (e: React.ChangeEvent<HTMLInputElement>) => {
         e.target.value = Number(e.target.value).toFixed(2)
-        setNewEnvelopeFill(Number(e.target.value).toFixed(2));
+        setFill(Number(e.target.value).toFixed(2));
     }
 
     return (
@@ -70,10 +97,10 @@ export function EditEnvelopeModal(props: EditEnvelopeModalProps) {
                                 name="envTitle"
                                 id="envTitle"
                                 placeholder="Rent"
-                                value={newEnvelopeTitle}
-                                onChange={(e) => setNewEnvelopeTitle(e.target.value)}
+                                value={title}
+                                onChange={(e) => setTitle(e.target.value)}
                             />
-                            <select className={text2} name="envType" id="envType" onChange={(e) => setNewEnvelopeType(e.target.value)}>
+                            <select value={type} className={text2} name="envType" id="envType" onChange={(e) => setType(e.target.value)}>
                                 <option value="bill">Bill</option>
                                 <option value="expense">Expense</option>
                                 <option value="spending">Spending</option>
@@ -86,15 +113,16 @@ export function EditEnvelopeModal(props: EditEnvelopeModalProps) {
                                     type="number"
                                     name="envFill"
                                     id="envFill"
+                                    value={fill}
                                     placeholder="1250.00"
-                                    onChange={(e) => setNewEnvelopeFill(e.target.value)}
+                                    onChange={(e) => setFill(e.target.value)}
                                     onBlur={handleFillBlur}
                                 />
                             </div>
                         </div>
                         <div className="space-y-4">
-                            <ButtonAction onClick={handleUpdateEnvelope} disabled={disabled} text="Add Envelope" />
-                            <ButtonCancel onClick={handleModalClick} text="Cancel" />
+                            <ButtonAction onClick={handleUpdateEnvelope} disabled={disabled} text="Update Envelope" />
+                            <ButtonCancel onClick={handleCancelClick} text="Cancel" />
                         </div>
                     </div>
                 </div>

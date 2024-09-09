@@ -1,17 +1,17 @@
-import { EnvelopeProp } from "../Types/types"
+import { EnvelopeProp } from "../Types/PropTypes"
 
 export function EnvelopeItem(props: EnvelopeProp) {
   return (
     <div className="w-5/6">
       <div className="border-t border-r border-b border-l border-gray-400 bg-white rounded-md p-4 flex justify-between">
         <div className="w-1/3">
-          <h5>{decodeURIComponent(props.envelope.ae_title)}</h5>
+          <h5>{decodeURIComponent(props.envelope.title)}</h5>
         </div>
         <div className="w-1/3">
-          <p>Amount: {props.envelope.ae_amount}</p>
+          <p>Amount: {props.envelope.amount}</p>
         </div>
         <div className="w-1/3">
-          <p>Total: {props.envelope.ae_fill}</p>
+          <p>Total: {props.envelope.fill}</p>
         </div>
       </div>
     </div>

@@ -2,59 +2,73 @@ import { useState } from "react";
 import { Alert } from "../Alert";
 import { modalBk, modalCard, text2 } from "../../lib/TailwindClass";
 import { isValidEnvelopeTitle } from "../../lib/TextValidate";
-import { envelopeAdd, envelopeGetAll } from "../../lib/Controller";
-import { AddEnvelopeModalProps, Envelope } from "../../Types/types";
+import { envelopeAdd, envelopeGetAll } from "../../Controllers/EnvelopeController";
+import { AddEnvelopeModalProps } from "../../Types/PropTypes";
 import { ButtonAction } from "../Buttons/ButtonAction";
 import { ButtonCancel } from "../Buttons/ButtonCancel";
+import { Envelope } from "../../Classes/Envelope";
+import { DbEnvelope } from "../../Types/DbTypes";
+
+//! REMOVE WITH AUTH
+const user_id = 1
 
 
 export function AddEnvelopeModal(props: AddEnvelopeModalProps) {
-    const [newEnvelope, setNewEnvelope] = useState<string>("");
-    const [newEnvelopeFill, setNewEnvelopeFill] = useState<string>("");
-    const [newEnvelopeType, setNewEnvelopeType] = useState<string>("bill");
+    const [title, setTitle] = useState<string>("");
+    const [fill, setFill] = useState<string>("");
+    const [type, setType] = useState<string>("bill");
     const [addEnvMsg, setAddEnvMsg] = useState<string | null>(null);
     const [disabled, setDisabled] = useState<boolean>(false);
 
     const handleAddEnvelope = async () => {
         setDisabled(true);
 
-        if (!isValidEnvelopeTitle(newEnvelope)) {
+        if (!isValidEnvelopeTitle(title)) {
             setDisabled(false);
             setAddEnvMsg("Invalid envelope name.");
             setTimeout(() => setAddEnvMsg(null), 3000);
             return;
         }
 
-        if (isNaN(Number(newEnvelopeFill)) || Number(newEnvelopeFill) <= 0) {
+        if (isNaN(Number(fill)) || Number(fill) <= 0) {
             setDisabled(false);
             setAddEnvMsg("Fill must be a valid monetary amount above $0.00.");
             setTimeout(() => setAddEnvMsg(null), 3000);
             return;
         }
 
-        const err = await envelopeAdd(newEnvelope, Number(newEnvelopeFill), newEnvelopeType);
+        const envData = {
+            user_id, id: null,
+            title: title,
+            fill: Number(fill),
+            amount: Number(fill),
+            type: type
+        }
+        const envelope: Envelope = new Envelope(envData)
+        const err = await envelopeAdd(envelope);
         if (err) {
             setDisabled(false);
             setAddEnvMsg(err)
             setTimeout(() => setAddEnvMsg(null), 3000);
+            return;
         }
 
         props.setLoading(true);
-        const [e, data] = await envelopeGetAll<Envelope>();
+        const [e, data] = await envelopeGetAll<DbEnvelope>();
 
         if (e) { props.setEnvelopes([]); props.setError(e); }
-        else { props.setEnvelopes(data?.data ?? []) }
+        else { props.setEnvelopes(data?.data.map((e: DbEnvelope) => new Envelope(e)) ?? []) }
 
         props.setLoading(false);
-        props.setOpenModal(false);
+        props.setAddEnvelope(false);
     }
 
 
-    const handleModalClick = () => { props.setOpenModal(false) };
+    const handleModalClick = () => { props.setAddEnvelope(false) };
 
     const handleFillBlur = (e: React.ChangeEvent<HTMLInputElement>) => {
         e.target.value = Number(e.target.value).toFixed(2)
-        setNewEnvelopeFill(Number(e.target.value).toFixed(2));
+        setFill(Number(e.target.value).toFixed(2));
     }
 
     return (
@@ -70,10 +84,10 @@ export function AddEnvelopeModal(props: AddEnvelopeModalProps) {
                                 name="envTitle"
                                 id="envTitle"
                                 placeholder="Rent"
-                                value={newEnvelope}
-                                onChange={(e) => setNewEnvelope(e.target.value)}
+                                value={title}
+                                onChange={(e) => setTitle(e.target.value)}
                             />
-                            <select className={text2} name="envType" id="envType" onChange={(e) => setNewEnvelopeType(e.target.value)}>
+                            <select className={text2} name="envType" id="envType" onChange={(e) => setType(e.target.value)}>
                                 <option value="bill">Bill</option>
                                 <option value="expense">Expense</option>
                                 <option value="spending">Spending</option>
@@ -87,7 +101,7 @@ export function AddEnvelopeModal(props: AddEnvelopeModalProps) {
                                     name="envFill"
                                     id="envFill"
                                     placeholder="1250.00"
-                                    onChange={(e) => setNewEnvelopeFill(e.target.value)}
+                                    onChange={(e) => setFill(e.target.value)}
                                     onBlur={handleFillBlur}
                                 />
                             </div>

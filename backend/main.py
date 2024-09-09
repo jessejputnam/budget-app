@@ -113,10 +113,11 @@ def update_envelope(envelope: EnvelopeEditSchema):
         cursor = conn.cursor()
 
         cmd = sql.envelope_update()
-        params = []
+        params = [envelope.title, envelope.fill, envelope.type, envelope.id]
+        print(f"\n\n{cmd}\n\n{params}\n\n")
         cursor.execute(cmd, params)
         cursor.commit()
-
+        res = VoidResponse("SUCCESS", 200, f"Envelope with id <{id}> updated")
     except pyodbc.Error as e:
         print(f"Error: {e}")
         cursor.rollback()

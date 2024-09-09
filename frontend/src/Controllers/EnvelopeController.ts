@@ -1,4 +1,5 @@
-import { ApiRes } from "../Types/types";
+import { ApiRes } from "../Types/Types.ts";
+import { Envelope } from "../Classes/Envelope.ts";
 
 const url = import.meta.env.VITE_URL;
 
@@ -21,7 +22,7 @@ export async function envelopeGetAll<T>(): Promise<ApiRes<T>> {
     }
 }
 
-export async function envelopeAdd(envName: string, envFill: number, envType: string): Promise<string | null> {
+export async function envelopeAdd(env: Envelope): Promise<string | null> {
     try {
         // 
         const res: Response = await fetch(`${url}/envelopes`, {
@@ -29,7 +30,7 @@ export async function envelopeAdd(envName: string, envFill: number, envType: str
             headers: {
                 "Content-Type": "application/json; charset=UTF-8"
             },
-            body: JSON.stringify({ user_id: 1, title: encodeURIComponent(envName), fill: envFill, type: envType })
+            body: JSON.stringify({ user_id: 1, title: encodeURIComponent(env.title), fill: env.amount, type: env.type })
         });
 
         if (!res.ok) {
@@ -59,6 +60,7 @@ export async function envelopeDeleteOne(envelopeId: number): Promise<string | nu
             console.log(`HTTP error: Status ${res.status}`);
             return `HTTP error: Status ${res.status}`;
         }
+
         const data = await res.json();
         if (data.status == "ERROR")
             return data.message
@@ -69,14 +71,28 @@ export async function envelopeDeleteOne(envelopeId: number): Promise<string | nu
     }
 }
 
-export async function envelopeUpdate(id: number, title: string, fill: number, type: string): Promise<string | null> {
+export async function envelopeUpdate(envelope: Envelope): Promise<string | null> {
     try {
+        const id = envelope.id;
+        if (id === null) return "Envelope ID missing."
+
         const res: Response = await fetch(`${url}/envelopes/${id}`, {
-            method: "DELETE",
+            method: "PATCH",
             headers: {
                 "Content-Type": "application/json; charset=UTF-8"
-            }
+            },
+            body: JSON.stringify(envelope)
         });
+
+        if (!res.ok) {
+            console.log(`HTTP error: Status ${res.status}`);
+            return `HTTP error: Status ${res.status}`;
+        }
+
+        const data = await res.json();
+        if (data.status == "ERROR")
+            return data.message
+        return null
     } catch (err) {
         console.log(err);
         return err instanceof Error ? err.message : err as string

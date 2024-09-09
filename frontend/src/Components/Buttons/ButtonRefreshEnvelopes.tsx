@@ -1,6 +1,6 @@
-import { envelopeGetAll } from "../../lib/Controller";
+import { envelopeGetAll } from "../../Controllers/EnvelopeController";
 import { btn1 } from "../../lib/TailwindClass";
-import { ButtonRefreshEnvelopesProps, Envelope } from "../../Types/types";
+import { ButtonRefreshEnvelopesProps, Envelope } from "../../Types/PropTypes";
 
 export function ButtonRefreshEnvelopes(props: ButtonRefreshEnvelopesProps) {
     const handleRefreshClick = async () => {

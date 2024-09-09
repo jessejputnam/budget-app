@@ -1,5 +1,5 @@
 import { btn2 } from "../../lib/TailwindClass";
-import { ButtonProps } from "../../Types/types";
+import { ButtonProps } from "../../Types/PropTypes";
 
 export function ButtonAction(props: ButtonProps) {
     return (

@@ -1,29 +1,36 @@
 // import { useState } from 'react'
-import { EditEnvelopeProp } from "../Types/types"
+// import { Envelope } from "../Classes/Envelope";
+import { EditEnvelopeProp } from "../Types/PropTypes";
 
 const envelopeClass = "border-t border-r border-b border-l border-gray-400 bg-white rounded-md p-4 flex justify-between";
 
-export function EditEnvelopeItem({ envelope, setDelEnvelope }: EditEnvelopeProp) {
+export function EditEnvelopeItem({ envelope, setDelEnvelope, setEditEnvelope }: EditEnvelopeProp) {
+    const envTitle = envelope.title;
+    const envFill = envelope.fill;
+
     const handleDeleteClick = (e: React.MouseEvent<HTMLParagraphElement, MouseEvent>) => {
         e.stopPropagation();
         setDelEnvelope(envelope)
     }
 
-    // const handleEditClick = (e) => {
-    // }
+    const handleEditClick = () => {
+        setEditEnvelope(envelope);
+    }
 
     return (
         <div className="w-5/6">
-            <div className={envelopeClass}>
-                <p className="text-red-700 hover:cursor-pointer"
-                    onClick={handleDeleteClick}>
-                    𝕏
-                </p>
-                <div className="w-1/3">
-                    <h5>{decodeURIComponent(envelope.ae_title)}</h5>
+            <div className={`${envelopeClass} hover:bg-slate-50`} onClick={handleEditClick}>
+                <div>
+                    <p className="text-red-800 font-extrabold hover:cursor-pointer hover:text-red-400 select-none text-justify"
+                        onClick={handleDeleteClick}>
+                        ×
+                    </p>
                 </div>
                 <div className="w-1/3">
-                    <p>Total: {envelope.ae_fill}</p>
+                    <h5>{decodeURIComponent(envTitle)}</h5>
+                </div>
+                <div className="w-1/3">
+                    <p>Total: {envFill}</p>
                 </div>
             </div>
         </div>

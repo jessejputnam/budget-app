@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
-import { Envelope } from "../Types/types";
-import { h2 } from "../lib/TailwindClass";
-import { envelopeGetAll } from "../lib/Controller";
+import { envSection, h2 } from "../lib/TailwindClass";
+import { envelopeGetAll } from "../Controllers/EnvelopeController";
 import { EnvelopeSection } from "../Components/EnvelopeSection";
 import { ButtonRefreshEnvelopes } from "../Components/Buttons/ButtonRefreshEnvelopes";
 import { LoadingSpinner } from "../Components/LoadingSpinner";
+import { Envelope } from "../Classes/Envelope";
+import { DbEnvelope } from "../Types/DbTypes";
 
 
 function HomeScreen() {
@@ -14,11 +15,12 @@ function HomeScreen() {
 
     useEffect(() => {
         const fetchData = async () => {
-            const [err, data] = await envelopeGetAll<Envelope>();
+            const [err, data] = await envelopeGetAll<DbEnvelope>();
 
             setLoading(false);
             if (err) setError(err);
-            else setEnvelopes(data?.data ?? [])
+            else setEnvelopes(data?.data.map((e: DbEnvelope) => new Envelope(e)) ?? [])
+
         }
 
         fetchData();
@@ -27,7 +29,7 @@ function HomeScreen() {
     const btnProps = { setEnvelopes, setLoading, setError }
 
     return (
-        <div>
+        <div className={envSection}>
             <h1 className={h2}>Envelopes</h1>
             {loading && <LoadingSpinner />}
             {error &&
